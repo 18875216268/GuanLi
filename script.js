@@ -418,31 +418,41 @@ async function loadTableData() {
 }
 
 // 记录批量操作相关函数
-// 修改操作菜单点击事件处理
+// 操作菜单点击事件处理
 function toggleDropdown(button) {
-    // 先关闭所有其他打开的下拉菜单
-    closeAllDropdowns();
-
+    // 先获取当前按钮对应的下拉菜单
     const dropdownContent = button.nextElementSibling;
     const isVisible = dropdownContent.style.display === 'block';
 
-    // 切换当前下拉菜单的显示状态
-    dropdownContent.style.display = isVisible ? 'none' : 'block';
+    // 关闭所有其他打开的下拉菜单
+    closeAllDropdowns();
 
-    // 如果显示下拉菜单，添加点击外部关闭的事件监听
-    if (!isVisible) {
-        const closeMenu = function (e) {
+    // 如果当前菜单是可见的，直接返回(这样就会关闭所有菜单)
+    if (isVisible) {
+        return;
+    }
+
+    // 显示当前下拉菜单
+    dropdownContent.style.display = 'block';
+
+    // 添加点击外部关闭菜单的事件监听
+    setTimeout(() => {
+        const closeMenu = function(e) {
             if (!button.parentElement.contains(e.target)) {
                 dropdownContent.style.display = 'none';
                 document.removeEventListener('click', closeMenu);
             }
         };
+        document.addEventListener('click', closeMenu);
+    }, 0);
+}
 
-        // 延迟添加事件监听，避免立即触发
-        setTimeout(() => {
-            document.addEventListener('click', closeMenu);
-        }, 0);
-    }
+// 关闭所有下拉菜单的函数保持不变
+function closeAllDropdowns() {
+    const dropdowns = document.querySelectorAll('.dropdown-content');
+    dropdowns.forEach(dropdown => {
+        dropdown.style.display = 'none';
+    });
 }
 
 function showOperationsModal() {
